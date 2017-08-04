@@ -113,7 +113,6 @@ add_filter( 'acf/rest_api/key', function( $key, $request, $type ) {
 
 
 
-
 /********
 **  PRESENTATION ONLY -
 ********/
@@ -185,6 +184,26 @@ function extraInfo(){
 }
 
 
+function output_htaccess( $rules ) {
+  #inssert our rule immediately after rewrite engine on
+  $rules_arr = explode("\n",$rules);
+  $new_rule = ['RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization}]'];
+  array_splice( $rules_arr, 2, 0, $new_rule ); 
+  $rules = implode("\n",$rules_arr);
+  return $rules;
+  # BEGIN WordPress
+  // <IfModule mod_rewrite.c>
+  // RewriteEngine On
+  // RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization}]
+  // RewriteBase /
+  // RewriteRule ^index\.php$ - [L]
+  // RewriteCond %{REQUEST_FILENAME} !-f
+  // RewriteCond %{REQUEST_FILENAME} !-d
+  // RewriteRule . /index.php [L]
+  // </IfModule>
+  # END WordPress
+}
+add_filter('mod_rewrite_rules', 'output_htaccess');
 
 
 
