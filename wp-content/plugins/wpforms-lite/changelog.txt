@@ -1,5 +1,21 @@
 == Changelog ==
 
+= 1.3.9.1 =
+- Changed: Template Export excludes array items with empty strings
+- Fixed: Admin notices displaying on plugin Welcome/activation screen
+- Fixed: WPForms admin pages displaying blank due to conflicts with a few other plugins
+
+= 1.3.9 =
+- Added: Complete redesign and refactor of admin area
+- Added: New Settings API
+- Added: Entry print preview compact mode
+- Added: Entry print preview view entry notes
+- Added: Dynamic field choices nest hierarchical items
+- Added: Form import/export to Tools sub page
+- Added: Form template export to Tools sub page
+- Changed: System Info content to new Tools sub-page
+- Changed: Shortcode provided in form builder now includes title/description arguments
+
 = 1.3.8 =
 - Changed: Available conditional logic rules/functionality with Providers have been updated
 - Changed: Updated form builder modals (jquery-confirm.js)

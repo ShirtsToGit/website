@@ -213,12 +213,12 @@ body {
 
 #wpforms-builder .wpforms-toolbar .wpforms-left {
 	position: absolute;
-	left: 15px;
-	top: 14px;
+	left: 12px;
+	top: 12px;
 }
 
 #wpforms-builder .wpforms-toolbar .wpforms-left img {
-	height: 46px;
+	height: 50px;
 }
 
 #wpforms-builder .wpforms-toolbar .wpforms-center {

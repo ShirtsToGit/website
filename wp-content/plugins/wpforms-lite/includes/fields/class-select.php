@@ -141,7 +141,7 @@ class WPForms_Field_Select extends WPForms_Field {
 					'orderby'        => 'title',
 					'order'          => 'ASC' ,
 				);
-				$posts  = get_posts( apply_filters( 'wpforms_dynamic_choice_post_type_args', $args, $field, $this->form_id ) );
+				$posts  = wpforms_get_hierarchical_object( apply_filters( 'wpforms_dynamic_choice_post_type_args', $args, $field, $this->form_id ), true );
 				$values = array();
 
 				foreach ( $posts as $post ) {
@@ -157,7 +157,7 @@ class WPForms_Field_Select extends WPForms_Field {
 					'hide_empty' => false,
 					'number'     => 1
 				);
-				$terms 	= get_terms( apply_filters( 'wpforms_dynamic_choice_taxonomy_args', $args, $field, $this->form_id ) );
+				$terms 	= wpforms_get_hierarchical_object( apply_filters( 'wpforms_dynamic_choice_taxonomy_args', $args, $field, $this->form_id ), true );
 				$values = array();
 
 				foreach ( $terms as $term ) {
@@ -245,7 +245,7 @@ class WPForms_Field_Select extends WPForms_Field {
 					'orderby'        => 'title',
 					'order'          => 'ASC' ,
 				);
-				$posts   = get_posts( apply_filters( 'wpforms_dynamic_choice_post_type_args', $args, $field, $form_data['id'] ) );
+				$posts   = wpforms_get_hierarchical_object( apply_filters( 'wpforms_dynamic_choice_post_type_args', $args, $field, $form_data['id'] ), true );
 				$choices = array();
 
 				foreach ( $posts as $post ) {
@@ -265,7 +265,7 @@ class WPForms_Field_Select extends WPForms_Field {
 					'taxonomy'   => $source,
 					'hide_empty' => false,
 				);
-				$terms 	 = get_terms( apply_filters( 'wpforms_dynamic_choice_taxonomy_args', $args, $field, $form_data['id'] ) );
+				$terms 	 = wpforms_get_hierarchical_object( apply_filters( 'wpforms_dynamic_choice_taxonomy_args', $args, $field, $form_data['id'] ), true );
 				$choices = array();
 
 				foreach ( $terms as $term ) {

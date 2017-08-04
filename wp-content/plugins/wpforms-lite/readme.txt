@@ -44,7 +44,7 @@ Building contact forms in WordPress can be time consuming. Why?
 
 Because every other WordPress contact form builder plugin requires you to build your contact form from scratch. The truth is it's often not necessary to create a contact form completely from scratch unless you really want to.
 
-Whether youÃ¢â‚¬â„¢re looking to create a simple contact form, request a quote form, donation form, payment order form, or a subscription form, we have a form template for you inside our contact form builder.
+Whether you're looking to create a simple contact form, request a quote form, donation form, payment order form, or a subscription form, we have a form template for you inside our contact form builder.
 
 WPForms comes with <a href="https://wpforms.com/features/form-templates/?utm_source=wprepo&utm_medium=link&utm_campaign=liteversion" rel="friend">pre-built form templates</a> to help you save time. You can add, remove, or re-arrange fields as necessary.
 
@@ -208,6 +208,22 @@ Thank you
 Syed Balkhi
 
 == Changelog ==
+
+= 1.3.9.1 =
+- Changed: Template Export excludes array items with empty strings
+- Fixed: Admin notices displaying on plugin Welcome/activation screen
+- Fixed: WPForms admin pages displaying blank due to conflicts with a few other plugins
+
+= 1.3.9 =
+- Added: Complete redesign and refactor of admin area
+- Added: New Settings API
+- Added: Entry print preview compact mode
+- Added: Entry print preview view entry notes
+- Added: Dynamic field choices nest hierarchical items
+- Added: Form import/export to Tools sub page
+- Added: Form template export to Tools sub page
+- Changed: System Info content to new Tools sub-page
+- Changed: Shortcode provided in form builder now includes title/description arguments
 
 = 1.3.8 =
 - Changed: Available conditional logic rules/functionality with Providers have been updated

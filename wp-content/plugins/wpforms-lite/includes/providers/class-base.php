@@ -959,7 +959,7 @@ abstract class WPForms_Provider {
 	public function integrations_tab_disconnect() {
 
 		// Run a security check
-		check_ajax_referer( 'wpforms-settings', 'nonce' );
+		check_ajax_referer( 'wpforms-admin', 'nonce' );
 
 		// Check for permissions
 		if ( !current_user_can( apply_filters( 'wpforms_manage_cap', 'manage_options' ) ) ) {
@@ -994,7 +994,7 @@ abstract class WPForms_Provider {
 			return;
 
 		// Run a security check
-		check_ajax_referer( 'wpforms-settings', 'nonce' );
+		check_ajax_referer( 'wpforms-admin', 'nonce' );
 
 		// Check for permissions
 		if ( !current_user_can( apply_filters( 'wpforms_manage_cap', 'manage_options' ) ) ) {
@@ -1079,10 +1079,10 @@ abstract class WPForms_Provider {
 						<?php
 						if ( !empty( $accounts ) ) {
 							foreach ( $accounts as $key => $account ) {
-								echo '<li>';
+								echo '<li class="wpforms-clear">';
 									echo '<span class="label">' . esc_html( $account['label'] ) . '</span>';
-									echo '<span class="date">' . __( 'Connected on: ', 'wpforms' ) . date( get_option( 'date_format', $account['date'] ) ) . '</span>';
-									echo '<a href="#" data-provider="' . $slug . '" data-key="' . $key . '">' . __( 'Disconnect ', 'wpforms' ) . '</a>';
+									echo '<span class="date">' . __( 'Connected on: ', 'wpforms' ) . date( get_option( 'date_format' ), $account['date'] ) . '</span>';
+									echo '<span class="remove"><a href="#" data-provider="' . $slug . '" data-key="' . $key . '">' . __( 'Disconnect ', 'wpforms' ) . '</a><span>';
 								echo '</li>';
 							}
 						}
@@ -1091,7 +1091,7 @@ abstract class WPForms_Provider {
 				</div>
 
 				<p class="wpforms-settings-provider-accounts-toggle">
-					<a class="button button-secondary" href="#" data-provider="<?php echo $slug; ?>"><i class="fa fa-plus"></i> <?php _e( 'Add New Account', 'wpforms' ); ?></a>
+					<a class="wpforms-btn wpforms-btn-md wpforms-btn-light-grey" href="#" data-provider="<?php echo $slug; ?>"><i class="fa fa-plus"></i> <?php _e( 'Add New Account', 'wpforms' ); ?></a>
 				</p>
 
 				<div class="wpforms-settings-provider-accounts-connect">
@@ -1103,7 +1103,7 @@ abstract class WPForms_Provider {
 						<?php $this->integrations_tab_new_form(); ?>
 					</p>
 
-					<p><button type="submit" class="button button-primary wpforms-settings-provider-connect" data-provider="<?php echo $slug; ?>" title="Connect to <?php echo $name; ?>"><?php _e( 'Connect to', 'wpforms' ); ?> <?php echo $name; ?></button> <i class="fa fa-cog fa-spin"></i></p>
+					<button type="submit" class="wpforms-btn wpforms-btn-md wpforms-btn-orange wpforms-settings-provider-connect" data-provider="<?php echo $slug; ?>" title="Connect to <?php echo $name; ?>"><?php _e( 'Connect to', 'wpforms' ); ?> <?php echo $name; ?></button>
 					</form>
 				</div>
 

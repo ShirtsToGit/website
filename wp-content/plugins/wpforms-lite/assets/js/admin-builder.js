@@ -1235,7 +1235,7 @@
 					$el.append('<i class="fa fa-cog fa-spin"></i>');
 
 					WPFormsBuilder.fieldAdd(type, {position: pos, placeholder: $el});
-   				}
+				   }
 			});
 
 			$('.wpforms-add-fields-button').draggable({
@@ -1304,7 +1304,16 @@
 			if (total == '1') {
 				$.alert({
 					title: false,
-					content: wpforms_builder.error_choice
+					content: wpforms_builder.error_choice,
+					icon: 'fa fa-info-circle',
+					type: 'blue',
+					buttons: {
+						confirm: {
+							text: wpforms_builder.ok,
+							btnClass: 'btn-confirm',
+							keys: ['enter']
+						}
+					}
 				});
 			} else {
 				$this.parent().remove();
@@ -1749,8 +1758,17 @@
 						msg = msg.replace('{limit}',limit);
 						msg = msg.replace('{total}',res.data.total);
 						$.alert({
-							title: wpforms_builder.heads_up,
-							content: msg
+							title: false,
+							content: wpforms_builder.heads_up,
+							icon: 'fa fa-info-circle',
+							type: 'blue',
+							buttons: {
+								confirm: {
+									text: msg,
+									btnClass: 'btn-confirm',
+									keys: ['enter']
+								}
+							}
 						});
 					}
 				} else {
@@ -2201,7 +2219,7 @@
 									icon: 'fa fa-exclamation-circle',
 									type: 'orange',
 									buttons: {
-										cancel: {
+										confirm: {
 											text: wpforms_builder.ok,
 											btnClass: 'btn-confirm',
 											keys: ['enter']
@@ -2235,7 +2253,7 @@
 			$(document).on('click', '#wpforms-embed', function(e) {
 				e.preventDefault();
 				var content = wpforms_builder.embed_modal;
-					content += '<input type=\'text\' value=\'[wpforms id="' + s.formID + '"]\' readonly id=\'wpforms-embed-shortcode\'>';
+					content += '<input type=\'text\' value=\'[wpforms id="' + s.formID + '" title="false" description="false"]\' readonly id=\'wpforms-embed-shortcode\'>';
 					content += wpforms_builder.embed_modal_2;
 					content += '<br><br><iframe width="600" height="338" src="https://www.youtube-nocookie.com/embed/IxGVz3AjEe0?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>';
 				$.alert({

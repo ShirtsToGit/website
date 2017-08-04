@@ -220,9 +220,9 @@ class WPForms_Overview_Table extends WP_List_Table {
 				foreach ( $ids as $id ) {
 					wpforms()->form->delete( $id );
 				}
-				printf( '<div class="updated"><p>%s</p></div>', _n( 'Form successfully deleted.', 'Forms successfully deleted', count( $ids ), 'wpforms' ) );
+				printf( '<div class="notice updated"><p>%s</p></div>', _n( 'Form successfully deleted.', 'Forms successfully deleted', count( $ids ), 'wpforms' ) );
 			} else {
-				printf( '<div class="error"><p>%s</p></div>', __( 'Security check failed', 'wpforms' ) );
+				printf( '<div class="notice error"><p>%s</p></div>', __( 'Security check failed', 'wpforms' ) );
 			}
 		}
 
@@ -233,9 +233,9 @@ class WPForms_Overview_Table extends WP_List_Table {
 				foreach ( $ids as $id ) {
 					$duplicate = wpforms()->form->duplicate( $id );
 				}
-				printf( '<div class="updated"><p>%s</p></div>', _n( 'Form successfully duplicated.', 'Forms successfully duplicated', count( $ids ), 'wpforms' ) );
+				printf( '<div class="notice updated"><p>%s</p></div>', _n( 'Form successfully duplicated.', 'Forms successfully duplicated', count( $ids ), 'wpforms' ) );
 			} else {
-				printf( '<div class="error"><p>%s</p></div>', __( 'Security check failed', 'wpforms' ) );
+				printf( '<div class="notice error"><p>%s</p></div>', __( 'Security check failed', 'wpforms' ) );
 			}
 		}
 	}

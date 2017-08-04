@@ -51,7 +51,7 @@ class WPForms_Builder_Panel_Providers extends WPForms_Builder_Panel {
 			'wpforms-builder-providers',
 			'wpforms_builder_providers',
 			array(
-				'url'                => esc_url( home_url( add_query_arg( array('view' => 'providers' ) ) ) ),
+				'url'                => esc_url( add_query_arg( array( 'view' => 'providers' ) ) ),
 				'confirm_save'       => __( 'We need to save your progress to continue to the Marketing panel. Is that OK?', 'wpforms' ),
 				'confirm_connection' => __( 'Are you sure you want to delete this connecton?', 'wpforms' ),
 				'prompt_connection'  => __( 'Enter a %type% nickname', 'wpforms' ),

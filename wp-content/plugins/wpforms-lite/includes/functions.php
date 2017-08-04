@@ -106,13 +106,25 @@ function wpforms_object_to_array( $object ) {
  * @since 1.0.0
  * @return mixed
  */
-function wpforms_setting( $key, $default = false, $option = 'wpforms_settings'  ) {
+function wpforms_setting( $key, $default = false, $option = 'wpforms_settings' ) {
 
+	$key     = wpforms_sanitize_key( $key );
 	$options = get_option( $option, false );
-
-	$value = is_array( $options ) && ! empty( $options[ $key ] ) ? $options[ $key ] : $default;
+	$value   = is_array( $options ) && ! empty( $options[ $key ] ) ? $options[ $key ] : $default;
 
 	return $value;
+}
+
+/**
+ * Sanitize key, primarily used for looking up options.
+ *
+ * @since 1.3.9
+ * @param string $key
+ * @return string
+ */
+function wpforms_sanitize_key( $key = '' ) {
+
+	return preg_replace( '/[^a-zA-Z0-9_\-\.\:\/]/', '', $key );
 }
 
 /**
@@ -952,7 +964,8 @@ function wpforms_get_ip() {
  * @return string
  */
 function wpforms_sanitize_hex_color( $color ) {
-	if ( '' === $color ) {
+
+	if ( empty( $color ) ) {
 		return '';
 	}
 
@@ -1005,6 +1018,185 @@ function wpforms_light_or_dark( $color, $dark = '#000000', $light = '#FFFFFF' ) 
 	$brightness = ( ( $c_r * 299 ) + ( $c_g * 587 ) + ( $c_b * 114 ) ) / 1000;
 
 	return $brightness > 155 ? $dark : $light;
+}
+
+/**
+ * Builds and returns either a taxonomy or post type object that is
+ * nests to accomodate any hierarchy.
+ *
+ * @since 1.3.9
+ * @param array $args
+ * @param bool $flat
+ * @return array
+ */
+function wpforms_get_hierarchical_object( $args = array(), $flat = false ) {
+
+	if ( empty( $args['taxonomy'] ) && empty( $args['post_type'] ) ) {
+		return false;
+	}
+
+	$children = array();
+	$parents  = array();
+
+	if ( ! empty( $args['post_type'] ) ) {
+
+		$defaults = array(
+			'posts_per_page' => -1,
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+		);
+		$args       = wp_parse_args( $args, $defaults );
+		$items      = get_posts( $args );
+		$ref_parent = 'post_parent';
+		$ref_id     = 'ID';
+		$ref_name   = 'post_title';
+
+	} elseif ( ! empty( $args['taxonomy'] ) ) {
+
+		$defaults = array(
+			'hide_empty' => false,
+		);
+		$args       = wp_parse_args( $args, $defaults );
+		$items      = get_terms( $args );
+		$ref_parent = 'parent';
+		$ref_id     = 'term_id';
+		$ref_name   = 'name';
+	}
+
+	if ( empty( $items ) || is_wp_error( $items ) ) {
+		return false;
+	}
+
+	foreach ( $items as $item ) {
+		if ( $item->{$ref_parent} ) {
+			$children[ $item->{$ref_id} ] = $item;
+			$children[ $item->{$ref_id} ]->ID = (int) $item->{$ref_id};
+		} else {
+			$parents[ $item->{$ref_id} ] = $item;
+			$parents[ $item->{$ref_id} ]->ID = (int) $item->{$ref_id};
+		}
+	}
+
+	while ( count ( $children ) >= 1 ) {
+		foreach ( $children as $child ) {
+			_wpforms_get_hierarchical_object_search( $child, $parents, $children, $ref_parent );
+		}
+	}
+
+	if ( $flat ) {
+		$parents_flat = array();
+		_wpforms_get_hierarchical_object_flatten( $parents, $parents_flat, $ref_name );
+		return $parents_flat;
+	}
+
+	return $parents;
+}
+
+/**
+ * Searches a given array and finds the parent of the provided object.
+ *
+ * @since 1.3.9
+ * @param array $child
+ * @param array $parents
+ * @param array $children
+ * @param string $ref_parent
+ */
+function _wpforms_get_hierarchical_object_search( $child, &$parents, &$children, $ref_parent ) {
+
+	foreach ( $parents as $id => $parent ) {
+
+		if ( $parent->ID === $child->{$ref_parent} ) {
+
+			if ( empty( $parent->children ) ) {
+				$parents[ $id ]->children = array( $child->ID => $child );
+			} else {
+				$parents[ $id ]->children[ $child->ID ] = $child;
+			}
+
+			unset( $children[ $child->ID ] );
+
+		} else if ( ! empty( $parent->children ) && is_array( $parent->children ) ) {
+
+			_wpforms_get_hierarchical_object_search( $child, $parent->children, $children, $ref_parent );
+		}
+	}
+}
+
+/**
+ * Flattens a heirarchical object.
+ *
+ * @since 1.3.9
+ * @param array $array
+ * @param array $output
+ * @param string $ref_name
+ * @param int $level
+ */
+function _wpforms_get_hierarchical_object_flatten( $array, &$output, $ref_name = 'name', $level = 0 ) {
+
+	foreach ( $array as $key => $item ) {
+
+		$indicator           = apply_filters( 'wpforms_hierarchical_object_indicator', '&mdash;' );
+		$item->{$ref_name}   = str_repeat( $indicator, $level ) . ' ' . $item->{$ref_name};
+		$item->depth         = $level + 1;
+		$output[ $item->ID ] = $item;
+
+		if ( ! empty( $item->children ) ) {
+
+			_wpforms_get_hierarchical_object_flatten( $item->children, $output, $ref_name, $level + 1);
+			unset( $output[ $item->ID ]->children );
+		}
+	}
+}
+
+/**
+ * Insert an array into another array before/after a certain key.
+ *
+ * @since 1.3.9
+ * @link https://gist.github.com/scribu/588429
+ * @param array $array The initial array
+ * @param array $pairs The array to insert
+ * @param string $key The certain key
+ * @param string $position Wether to insert the array before or after the key
+ * @return array
+ */
+function wpforms_array_insert( $array, $pairs, $key, $position = 'after' ) {
+
+	$key_pos = array_search( $key, array_keys( $array ) );
+	if ( 'after' == $position ) {
+		$key_pos++;
+	}
+
+	if ( false !== $key_pos ) {
+		$result = array_slice( $array, 0, $key_pos );
+		$result = array_merge( $result, $pairs );
+		$result = array_merge( $result, array_slice( $array, $key_pos ) );
+	} else {
+		$result = array_merge( $array, $pairs );
+	}
+
+	return $result;
+}
+
+/**
+ * Recursively remove empty strings from an array.
+ *
+ * @since 1.3.9.1
+ * @param array $data
+ * @return array
+ */
+function wpforms_array_remove_empty_strings( $data ) {
+
+	foreach ( $data as $key => $value ) {
+		if ( is_array( $value ) ) {
+			$data[ $key ] = wpforms_array_remove_empty_strings( $data[ $key ] );
+		}
+
+		if ( '' === $data[ $key ] ) {
+			unset( $data[ $key ] );
+		}
+	}
+
+	return $data;
 }
 
 /**
@@ -1117,20 +1309,6 @@ function wpforms_log( $title = '', $message = '', $args = array()  ) {
 
 	// Create log entry
 	wpforms()->logs->add( $title, $message, $parent, $parent, $meta );
-}
-
-/**
- * Insert element into an array at a specific point a preserve the key.
- *
- * @since 1.3.3
- * @param array $array
- * @param array $values
- * @param int $offset
- * @return array
- */
-function wpforms_array_insert( $array, $values, $offset ) {
-
-	return array_slice( $array, 0, $offset, true ) + $values + array_slice( $array, $offset, NULL, true );
 }
 
 /**

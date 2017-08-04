@@ -43,14 +43,6 @@ abstract class WPForms_Field {
 	public $order = 20;
 
 	/**
-	 * Field version number, used to introduce new features and capabilities.
-	 *
-	 * @since 1.3.7
-	 * @var integer
-	 */
-	public $version = 1;
-
-	/**
 	 * Field group the field belongs to.
 	 *
 	 * @since 1.0.0
@@ -534,9 +526,12 @@ abstract class WPForms_Field {
 			// CSS classes ---------------------------------------------------//
 
 			case 'css':
+				$toggle  = '';
 				$value   = ! empty( $field['css'] ) ? esc_attr( $field['css'] ) : '';
 				$tooltip = __( 'Enter CSS class names for the form field container. Class names should be separated with spaces.', 'wpforms' );
-				$toggle  = '<a href="#" class="toggle-layout-selector-display"><i class="fa fa-th-large"></i> <span>' . __( 'Show Layouts', 'wpforms' ) . '</span></a>';
+				if ( ! in_array( $field['type'], array( 'pagebreak' ), true ) ) {
+					$toggle  = '<a href="#" class="toggle-layout-selector-display"><i class="fa fa-th-large"></i> <span>' . __( 'Show Layouts', 'wpforms' ) . '</span></a>';
+				}
 				// Build output
 				$output  = $this->field_element( 'label', $field, array( 'slug' => 'css', 'value' => __( 'CSS Classes', 'wpforms' ), 'tooltip' => $tooltip, 'after_tooltip' => $toggle ), false );
 				$output .= $this->field_element( 'text',  $field, array( 'slug' => 'css', 'value' => $value ), false );

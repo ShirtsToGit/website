@@ -52,13 +52,13 @@ class WPForms_Field_Radio extends WPForms_Field {
 		//--------------------------------------------------------------------//
 		// Basic field options
 		//--------------------------------------------------------------------//
-		
+
 		// Options open markup
 		$this->field_option( 'basic-options', $field, array( 'markup' => 'open' ) );
-		
+
 		// Label
 		$this->field_option( 'label', $field );
-		
+
 		// Choices
 		$this->field_option( 'choices', $field );
 
@@ -70,11 +70,11 @@ class WPForms_Field_Radio extends WPForms_Field {
 
 		// Options close markup
 		$this->field_option( 'basic-options', $field, array( 'markup' => 'close' ) );
-		
+
 		//--------------------------------------------------------------------//
 		// Advanced field options
 		//--------------------------------------------------------------------//
-	
+
 		// Options open markup
 		$this->field_option( 'advanced-options', $field, array( 'markup' => 'open' ) );
 
@@ -116,25 +116,25 @@ class WPForms_Field_Radio extends WPForms_Field {
 
 		// Label
 		$this->field_preview_option( 'label', $field );
-		
+
 		// Field radio elements
 		echo '<ul class="primary-input">';
 
-			// Check to see if this field is configured for Dynamic Choices, 
+			// Check to see if this field is configured for Dynamic Choices,
 			// either auto populating from a post type or a taxonomy.
 			if ( 'post_type' == $dynamic && !empty( $field['dynamic_post_type'] ) ) {
-			
+
 				// Post type dynamic populating
 				$source = $field['dynamic_post_type'];
 				$total  = wp_count_posts( $source );
 				$total  = $total->publish;
-				$args   = array( 
-					'post_type'      => $source, 
-					'posts_per_page' => 20, 
-					'orderby'        => 'title', 
+				$args   = array(
+					'post_type'      => $source,
+					'posts_per_page' => 20,
+					'orderby'        => 'title',
 					'order'          => 'ASC' ,
 				);
-				$posts  = get_posts( apply_filters( 'wpforms_dynamic_choice_post_type_args', $args, $field, $this->form_id ) );
+				$posts  = wpforms_get_hierarchical_object( apply_filters( 'wpforms_dynamic_choice_post_type_args', $args, $field, $this->form_id ), true );
 				$values = array();
 
 				foreach ( $posts as $post ) {
@@ -146,12 +146,12 @@ class WPForms_Field_Radio extends WPForms_Field {
 				// Taxonomy dynamic populating
 				$source = $field['dynamic_taxonomy'];
 				$total  = wp_count_terms( $source );
-				$args   = array( 
-					'taxonomy'   => $source, 
-					'hide_empty' => false, 
+				$args   = array(
+					'taxonomy'   => $source,
+					'hide_empty' => false,
 					'number'     => 20
-				); 
-				$terms 	= get_terms( apply_filters( 'wpforms_dynamic_choice_taxonomy_args', $args, $field, $this->form_id ) );
+				);
+				$terms 	= wpforms_get_hierarchical_object( apply_filters( 'wpforms_dynamic_choice_taxonomy_args', $args, $field, $this->form_id ), true );
 				$values = array();
 
 				foreach ( $terms as $term ) {
@@ -169,7 +169,7 @@ class WPForms_Field_Radio extends WPForms_Field {
 
 				$default  = isset( $value['default'] ) ? $value['default'] : '';
 				$selected = checked( '1', $default, false );
-				
+
 				printf( '<li><input type="radio" %s disabled>%s</li>', $selected, $value['label'] );
 			}
 
@@ -194,7 +194,7 @@ class WPForms_Field_Radio extends WPForms_Field {
 	 * @param array $form_data
 	 */
 	public function field_display( $field, $field_atts, $form_data ) {
-	
+
 		// Setup and sanitize the necessary data
 		$field             = apply_filters( 'wpforms_radio_field_display', $field, $field_atts, $form_data );
 		$field_required    = !empty( $field['required'] ) ? ' required' : '';
@@ -211,25 +211,26 @@ class WPForms_Field_Radio extends WPForms_Field {
 			}
 		}
 
-		// Check to see if this field is configured for Dynamic Choices, 
+		// Check to see if this field is configured for Dynamic Choices,
 		// either auto populating from a post type or a taxonomy.
 		if ( 'post_type' == $dynamic && !empty( $field['dynamic_post_type'] ) ) {
-		
+
 			// Post type dynamic populating
 			$source = $field['dynamic_post_type'];
-			$args   = array( 
-				'post_type'      => $source, 
-				'posts_per_page' => -1, 
-				'orderby'        => 'title', 
+			$args   = array(
+				'post_type'      => $source,
+				'posts_per_page' => -1,
+				'orderby'        => 'title',
 				'order'          => 'ASC' ,
 			);
-			$posts   = get_posts( apply_filters( 'wpforms_dynamic_choice_post_type_args', $args, $field, $form_data['id'] ) );
+			$posts   = wpforms_get_hierarchical_object( apply_filters( 'wpforms_dynamic_choice_post_type_args', $args, $field, $form_data['id'] ), true );
 			$choices = array();
 
 			foreach ( $posts as $post ) {
-				$choices[] = array( 
+				$choices[] = array(
 					'value' => $post->ID,
-					'label' => $post->post_title
+					'label' => $post->post_title,
+					'depth' => isset( $post->depth ) ? absint( $post->depth ) : 1,
 				);
 			}
 
@@ -239,17 +240,18 @@ class WPForms_Field_Radio extends WPForms_Field {
 
 			// Taxonomy dynamic populating
 			$source = $field['dynamic_taxonomy'];
-			$args   = array( 
-				'taxonomy'   => $source, 
-				'hide_empty' => false, 
-			); 
-			$terms 	 = get_terms( apply_filters( 'wpforms_dynamic_choice_taxonomy_args', $args, $field, $form_data['id'] ) );
+			$args   = array(
+				'taxonomy'   => $source,
+				'hide_empty' => false,
+			);
+			$terms 	 = wpforms_get_hierarchical_object( apply_filters( 'wpforms_dynamic_choice_taxonomy_args', $args, $field, $form_data['id'] ), true );
 			$choices = array();
-			
+
 			foreach ( $terms as $term ) {
-				$choices[] = array( 
+				$choices[] = array(
 					'value' => $term->term_id,
-					'label' => $term->name
+					'label' => $term->name,
+					'depth' => isset( $term->depth ) ? absint( $term->depth ) : 1,
 				);
 			}
 
@@ -258,17 +260,18 @@ class WPForms_Field_Radio extends WPForms_Field {
 
 		// List
 		printf( '<ul id="%s" class="%s" %s>', $field_id, $field_class, $field_data );
-			
+
 			foreach( $choices as $key => $choice ) {
-			
+
 				$selected = isset( $choice['default'] ) ? '1' : '0';
 				$val      = isset( $field['show_values'] ) ? esc_attr( $choice['value'] ) : esc_attr( $choice['label'] );
-			
-				printf( '<li class="choice-%d">', $key );
-			
+				$depth    = isset( $choice['depth'] ) ? absint( $choice['depth'] ) : 1;
+
+				printf( '<li class="choice-%d depth-%d">', $key, $depth );
+
 					// Radio elements
 					printf( '<input type="radio" id="wpforms-%s-field_%d_%d" name="wpforms[fields][%d]" value="%s" %s %s>',
-						$form_id, 
+						$form_id,
 						$field['id'],
 						$key,
 						$field['id'],
@@ -276,9 +279,9 @@ class WPForms_Field_Radio extends WPForms_Field {
 						checked( '1', $selected, false ),
 						$field_required
 					);
-			
+
 					printf( '<label class="wpforms-field-label-inline" for="wpforms-%d-field_%d_%d">%s</label>', $form_id, $field['id'], $key, wp_kses_post( $choice['label'] ) );
-			
+
 				echo '</li>';
 			}
 
@@ -332,7 +335,7 @@ class WPForms_Field_Radio extends WPForms_Field {
 			if ( ! is_wp_error( $term ) && !empty( $term ) ) {
 				$data['value'] = esc_html( $term->name );
 			}
-			
+
 		} else {
 
 			// Normal processing, dynamic population is off
@@ -340,7 +343,7 @@ class WPForms_Field_Radio extends WPForms_Field {
 			// If show_values is true, that means values posted are the raw values
 			// and not the labels. So we need to get the label values.
 			if ( !empty( $field['show_values'] ) && '1' == $field['show_values'] ) {
-				
+
 				foreach ( $field['choices'] as $choice ) {
 					if ( $choice['value'] === $field_submit ) {
 						$value = $choice['label'];

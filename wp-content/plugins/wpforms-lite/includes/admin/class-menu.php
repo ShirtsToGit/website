@@ -7,7 +7,7 @@
  * @since      1.0.0
  * @license    GPL-2.0+
  * @copyright  Copyright (c) 2016, WPForms LLC
-*/
+ */
 class WPForms_Admin_Menu {
 
 	/**
@@ -17,9 +17,12 @@ class WPForms_Admin_Menu {
 	 */
 	public function __construct() {
 
-		// Let's make some menus
-		add_action( 'admin_menu',            array( $this, 'register_menus' ), 9    );
-		add_action( 'admin_enqueue_scripts', array( $this, 'menu_icon'      )       );
+		// Let's make some menus.
+		add_action( 'admin_menu',         array( $this, 'register_menus' ), 9    );
+		add_action( 'admin_print_styles', array( $this, 'menu_icon'      )       );
+
+		// Plugins page settings link.
+		add_filter( 'plugin_action_links_' . plugin_basename( WPFORMS_PLUGIN_DIR . 'wpforms.php' ), array( $this, 'settings_link' ) );
 	}
 
 	/**
@@ -31,7 +34,7 @@ class WPForms_Admin_Menu {
 
 		$menu_cap = apply_filters( 'wpforms_manage_cap', 'manage_options' );
 
-		// Default Forms top level menu item
+		// Default Forms top level menu item.
 		add_menu_page(
 			__( 'WPForms', 'wpforms' ),
 			__( 'WPForms', 'wpforms' ),
@@ -42,7 +45,7 @@ class WPForms_Admin_Menu {
 			apply_filters( 'wpforms_menu_position', '57.7' )
 		);
 
-		// All Forms sub menu item
+		// All Forms sub menu item.
 		add_submenu_page(
 			'wpforms-overview',
 			__( 'WPForms', 'wpforms' ),
@@ -52,7 +55,7 @@ class WPForms_Admin_Menu {
 			array( $this, 'admin_page' )
 		);
 
-		// Add New sub menu item
+		// Add New sub menu item.
 		add_submenu_page(
 			'wpforms-overview',
 			__( 'WPForms Builder', 'wpforms' ),
@@ -62,7 +65,7 @@ class WPForms_Admin_Menu {
 			array( $this, 'admin_page' )
 		);
 
-		// Entries sub menu item
+		// Entries sub menu item.
 		add_submenu_page(
 			'wpforms-overview',
 			__( 'Form Entries', 'wpforms' ),
@@ -74,13 +77,23 @@ class WPForms_Admin_Menu {
 
 		do_action( 'wpform_admin_menu', $this );
 
-		// Settings sub menu item
+		// Settings sub menu item.
 		add_submenu_page(
 			'wpforms-overview',
 			__( 'WPForms Settings', 'wpforms' ),
 			__( 'Settings', 'wpforms' ),
 			$menu_cap,
 			'wpforms-settings',
+			array( $this, 'admin_page' )
+		);
+
+		// Tools sub menu item.
+		add_submenu_page(
+			'wpforms-overview',
+			__( 'WPForms Tools', 'wpforms' ),
+			__( 'Tools', 'wpforms' ),
+			$menu_cap,
+			'wpforms-tools',
 			array( $this, 'admin_page' )
 		);
 
@@ -94,7 +107,7 @@ class WPForms_Admin_Menu {
 			array( $this, 'admin_page' )
 		);
 
-		// Addons submenu page
+		// Addons submenu page.
 		add_submenu_page(
 			'wpforms-overview',
 			__( 'WPForms Addons', 'wpforms' ),
@@ -105,6 +118,11 @@ class WPForms_Admin_Menu {
 		);
 	}
 
+	/**
+	 * Wrapper for the hook to render our custom settings pages.
+	 *
+	 * @since 1.0.0
+	 */
 	public function admin_page() {
 
 		do_action( 'wpforms_admin_page' );
@@ -117,12 +135,70 @@ class WPForms_Admin_Menu {
 	 */
 	public function menu_icon() {
 
-		wp_enqueue_style(
-			'wpforms-menu',
-			WPFORMS_PLUGIN_URL . 'assets/css/admin-menu.css',
-			null,
-			WPFORMS_VERSION
-		);
+		$menu_cap = apply_filters( 'wpforms_manage_cap', 'manage_options' );
+
+		if ( ! current_user_can( $menu_cap ) ) {
+			return;
+		}
+		?>
+		<style type="text/css">
+			@font-face {
+				font-family: "wpforms-menu";
+				src:url("<?php echo WPFORMS_PLUGIN_URL; ?>assets/fonts/wpforms-menu.eot");
+				src:url("<?php echo WPFORMS_PLUGIN_URL; ?>assets/fonts/wpforms-menu.eot?#iefix") format("embedded-opentype"),
+					url("<?php echo WPFORMS_PLUGIN_URL; ?>assets/fonts/wpforms-menu.woff") format("woff"),
+					url("<?php echo WPFORMS_PLUGIN_URL; ?>assets/fonts/wpforms-menu.ttf") format("truetype"),
+					url("<?php echo WPFORMS_PLUGIN_URL; ?>assets/fonts/wpforms-menu.svg#wpforms") format("svg");
+				font-weight: normal;
+				font-style: normal;
+			}
+			#toplevel_page_wpforms-overview .wp-menu-image:before,
+			.wpforms-menu-icon:before {
+				content: "\61";
+				font-family: "wpforms-menu" !important;
+				font-style: normal !important;
+				font-weight: normal !important;
+				font-variant: normal !important;
+				text-transform: none !important;
+				speak: none;
+				line-height: 1;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+			#toplevel_page_wpforms-overview .wp-menu-image:before {
+				font-size: 1.15em;
+				padding-top: 9px;
+			}
+		</style>
+		<?php
 	}
+
+	/**
+	 * Add settings link to the Plugins page.
+	 *
+	 * @since 1.3.9
+	 * @param array $links
+	 * @return array $links
+	 */
+	public function settings_link( $links ) {
+
+		$admin_link = add_query_arg(
+			array(
+				'page' => 'wpforms-settings',
+			),
+			admin_url( 'admin.php' )
+		);
+
+		$setting_link = sprintf(
+			'<a href="%s">%s</a>',
+			$admin_link ,
+			__( 'Settings', 'wpforms' )
+		);
+
+		array_unshift( $links, $setting_link );
+
+		return $links;
+	}
+
 }
-$wpforms_admin_menu = new WPForms_Admin_Menu;
+new WPForms_Admin_Menu;

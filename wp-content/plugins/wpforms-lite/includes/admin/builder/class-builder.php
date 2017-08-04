@@ -173,14 +173,14 @@ class WPForms_Builder {
 			'jquery-confirm',
 			WPFORMS_PLUGIN_URL . 'assets/css/jquery-confirm.min.css',
 			null,
-			'2.0.0'
+			'3.2.3'
 		);
 
 		wp_enqueue_style(
 			'minicolors',
 			WPFORMS_PLUGIN_URL . 'assets/css/jquery.minicolors.css',
 			null,
-			'2.2.3'
+			'2.2.6'
 		);
 
 		wp_enqueue_style(
@@ -217,7 +217,7 @@ class WPForms_Builder {
 			'jquery-confirm',
 			WPFORMS_PLUGIN_URL . 'assets/js/jquery.jquery-confirm.min.js',
 			array(),
-			'2.0.0',
+			'3.2.3',
 			false
 		);
 
@@ -241,7 +241,7 @@ class WPForms_Builder {
 			'minicolors',
 			WPFORMS_PLUGIN_URL . 'assets/js/jquery.minicolors.min.js',
 			array( 'jquery' ),
-			'2.2.3',
+			'2.2.6',
 			false
 		);
 
@@ -439,7 +439,7 @@ class WPForms_Builder {
 
 					<div class="wpforms-left">
 
-						<img src="<?php echo WPFORMS_PLUGIN_URL; ?>assets/images/logo-builder.png" alt="Sullie WPForms mascot">
+						<img src="<?php echo WPFORMS_PLUGIN_URL; ?>assets/images/sullie-alt.png" alt="Sullie WPForms mascot">
 
 					</div>
 
